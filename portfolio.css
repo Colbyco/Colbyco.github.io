@@ -78,6 +78,9 @@ h1 { margin: 1.35rem 0 1.55rem -.075em; font: 500 clamp(5.65rem, 8.35vw, 8.65rem
 .project > .meta { grid-column: 1; grid-row: 1 / span 4; padding: .26rem .5rem 0 0; max-width: 10.5rem; line-height: 1.65; }
 .project > :not(.meta) { grid-column: 2; }
 .project h4 { font: 650 clamp(1.32rem, 2.1vw, 1.7rem)/1.2 "Instrument Sans", "Segoe UI", Arial, sans-serif; letter-spacing: -.045em; }
+.project h4, .feature-content h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .5rem; }
+.project-stage { color: var(--muted); font: 500 .98rem/1.4 "Instrument Sans", "Segoe UI", Arial, sans-serif; letter-spacing: normal; }
+.feature .project-stage { color: #eeebff; }
 .project > p:not(.meta), details p, .roles article > p:not(.meta) { color: var(--body); font-size: 1rem; line-height: 1.58; max-width: 44rem; }
 .project > a, .project-links a { color: var(--indigo); font-weight: 640; font-size: .92rem; }
 .project > a, .project-links { justify-self: start; padding-block: .3rem; }
