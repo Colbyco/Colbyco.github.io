@@ -70,10 +70,9 @@ h1 { margin: 1.35rem 0 1.55rem -.075em; font: 500 clamp(5.65rem, 8.35vw, 8.65rem
 .year-nav a::before { content: ""; position: absolute; width: .44rem; height: .44rem; border-radius: 50%; background: var(--paper); border: 1px solid #777484; left: -.27rem; top: calc(50% - .22rem); }
 .year { scroll-margin-top: 1.5rem; margin-bottom: 3rem; }
 .year:last-child { margin-bottom: 0; }
-.year > h3 { display: flex; align-items: baseline; gap: 1.05rem; padding-bottom: .76rem; border-bottom: 2px solid var(--ink); font: 500 2.32rem/1 Georgia, serif; letter-spacing: -.055em; }
+.year > h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem 1.05rem; padding-bottom: .76rem; border-bottom: 2px solid var(--ink); font: 500 2.32rem/1 Georgia, serif; letter-spacing: -.055em; }
 .year h3 span { font: 600 .88rem/1.45 "Instrument Sans", "Segoe UI", Arial, sans-serif; color: var(--muted); letter-spacing: 0; }
 .project { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: .52rem 1.1rem; align-items: start; padding: 1.55rem 0; }
-.project + .project { border-top: 1px solid var(--line); }
 .meta { color: var(--muted); font-size: .7rem; }
 .project > .meta { grid-column: 1; grid-row: 1 / span 4; padding: .26rem .5rem 0 0; max-width: 10.5rem; line-height: 1.65; }
 .project > :not(.meta) { grid-column: 2; }
