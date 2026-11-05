@@ -12,8 +12,8 @@
   <meta property="og:url" content="https://colbyco.github.io/">
   <link rel="canonical" href="https://colbyco.github.io/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%233f3882'/%3E%3Cpath d='M21 15H15L8 24l7 9h6m5-18h7l5 5-5 4 6 4-6 5h-7Z' fill='none' stroke='%23e7f8a9' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./portfolio.css?v=cca8ad0b">
-  <script src="./aspicio-preview.js?v=4aafce05" defer></script>
+  <link rel="stylesheet" href="./portfolio.css?v=c69db44b">
+  <script src="./aspicio-preview.js?v=2a4ad90d" defer></script>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -33,20 +33,30 @@
   <main id="main">
     <section class="hero wrap" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow location"><span aria-hidden="true"></span>Seattle, Washington</p>
-        <h1 id="hero-title">Colby <br>Baker<span class="period">.</span></h1>
-        <p class="intro-role">Software engineer</p>
-        <p class="intro">I build healthcare software at CVS Health and created Aspicio, an astrology platform for exploring charts, the night sky, and places.</p>
-        <div class="actions">
-          <a class="button" href="#projects">Explore my projects <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="https://github.com/Colbyco">GitHub <span aria-hidden="true">↗</span></a>
+        <div class="hero-identity">
+          <h1 id="hero-title">Colby Baker<span class="period">.</span></h1>
+          <p class="intro-role">Software engineer at CVS Health</p>
+        </div>
+        <div class="hero-summary">
+          <p class="intro">I build healthcare APIs and AI services.</p>
+          <div class="actions">
+            <p class="location">Seattle, Washington</p>
+            <a class="text-link" href="https://github.com/Colbyco">GitHub <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
       </div>
       <article class="feature" aria-labelledby="featured-name">
-        <div class="feature-header"><span class="eyebrow">Featured project</span><span class="feature-date">2026</span></div>
-        <div class="feature-title">
-          <h2 id="featured-name">Aspicio</h2>
-          <p>Third year as a software engineer</p>
+        <div class="feature-overview">
+          <div class="feature-identity">
+            <p class="eyebrow">Featured project</p>
+            <h2 id="featured-name">Aspicio</h2>
+            <p class="feature-date"><time datetime="2026-07">July 2026</time> - Third year as a software engineer</p>
+          </div>
+          <div class="feature-description">
+            <p>I built interactive birth charts, a 3D sky, and relocation maps, with NASA JPL ephemeris calculations and rules-based readings.</p>
+            <ul class="feature-tech" aria-label="Aspicio technologies"><li>Next.js</li><li>TypeScript</li><li>Three.js</li></ul>
+          </div>
+          <a class="feature-link" id="aspicio-preview-open" href="https://aspicio.app/chart" target="_blank" rel="noopener noreferrer">Open Aspicio <span aria-hidden="true">↗</span></a>
         </div>
         <div class="aspicio-preview" id="aspicio-preview" hidden>
           <iframe id="aspicio-preview-frame" title="Aspicio live site" loading="eager" allow="clipboard-write" referrerpolicy="strict-origin-when-cross-origin" aria-hidden="true" tabindex="-1"></iframe>
@@ -59,9 +69,6 @@
         <noscript>
           <figure class="chart-frame"><img src="./j2000.svg" width="540" height="300" alt="A circular plot showing the geocentric longitudes of ten solar system bodies."><figcaption>Sample planetary positions · 1 Jan 2000. Enable JavaScript for the interactive preview.</figcaption></figure>
         </noscript>
-        <div class="feature-content">
-          <a class="feature-link" id="aspicio-preview-open" href="https://aspicio.app/chart" target="_blank" rel="noopener noreferrer">Open Aspicio in a new tab <span aria-hidden="true">↗</span></a>
-        </div>
       </article>
     </section>
     <section class="archive" id="projects" aria-labelledby="projects-title">
@@ -160,8 +167,7 @@
               <article class="project">
                 <div class="project-content">
                   <h4>Aspicio</h4>
-                  <p>A birth chart, a 3D sky, and a map offer three ways to explore planetary positions. Aspicio uses NASA JPL ephemeris data for its calculations and a rules engine to compose readings.</p>
-                  <details><summary>How the views fit together</summary><p>The chart plots bodies and aspects for a time and place. The sky puts those bodies among the stars. The Places map lets you move the location and explore how a relocation chart changes.</p></details>
+                  <p>Birth charts plot bodies and aspects for a time and place. A 3D sky puts them among the stars, and the Places map explores relocation charts. Calculations use NASA JPL ephemeris data, with a rules engine for readings.</p>
                   <div class="project-links"><a href="https://aspicio.app">Open Aspicio <span aria-hidden="true">↗</span></a><a href="https://aspicio.app/sky">Explore the sky <span aria-hidden="true">↗</span></a><a href="https://aspicio.app/places">Open Places <span aria-hidden="true">↗</span></a></div>
                 </div>
                 <ul class="project-tech" aria-label="Technologies and platforms">

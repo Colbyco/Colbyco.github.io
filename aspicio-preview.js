@@ -19,6 +19,7 @@
     lat: "51.4779",
     lng: "0",
     loc: "Greenwich",
+    scroll: "chart",
   }).toString();
   open.href = chartUrl.href;
 
@@ -44,7 +45,7 @@
     timeout = window.setTimeout(() => {
       preview.classList.add("has-error");
       preview.setAttribute("aria-busy", "false");
-      message.textContent = "The preview is taking a little longer. Try again or open Aspicio below.";
+      message.textContent = "The preview is taking a little longer. Try again or use Open Aspicio above.";
       retry.hidden = false;
     }, 20000);
   }
