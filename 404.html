@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Colby Baker · Software Engineer</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://colbybaker.dev/" />
+    <meta http-equiv="refresh" content="0; url=https://colbybaker.dev/" />
+    <script>
+      // The portfolio moved to colbybaker.dev. Carry old project hashes over to their new ids.
+      var map = { chatbot: "openai-chatbot", music: "music-search", spotify: "spotify-classic-lyrics" };
+      var h = location.hash.replace(/^#/, "");
+      var hash = h ? "#" + (map[h] || h) : "";
+      location.replace("https://colbybaker.dev/" + hash);
+    </script>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; margin: 15vh auto; max-width: 36rem; padding: 0 1.5rem; color: #15171c; }
+      a { color: #2348e6; }
+    </style>
+  </head>
+  <body>
+    <p>This site has moved to <a href="https://colbybaker.dev/">colbybaker.dev</a>.</p>
+  </body>
+</html>
