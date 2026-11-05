@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>OpenAI Chatbot · 2022 UI archive</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.9.55/css/materialdesignicons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.0.0-beta.4/dist/vuetify.min.css">
+<style>
+
+  .settingsText {
+    color: #b982f5;
+  }
+
+  .messages {
+    font-family: "Arial";
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .aiMessage {
+    color: white;
+    min-width: 10px;
+    padding-left: 3px;
+    margin-top: 10px;
+    max-width: 500px;
+    overflow-wrap: break-word;
+  }
+
+  .userMessage {
+    color: white;
+    min-width: 10px;
+    max-width: 580px;
+    text-align: right;
+    margin-right: 10px;
+    margin-top: 10px;
+    overflow-wrap: break-word;
+  }
+
+  .aiBubble {
+    display: inline-block;
+    min-width: 10px;
+    background-color: #869e6c;
+    padding: 7px 10px;
+    border-radius: 10px 10px 10px 0px;
+    margin: 10px;
+    max-width: 500px;
+    overflow-wrap: break-word;
+  }
+
+  .userBubble {
+    display: inline-block;
+    min-width: 10px;
+    max-width: 580px;
+    background-color: #b982f5;
+    padding: 7px 10px;
+    border-radius: 10px 10px 0px 10px;
+    overflow-wrap: break-word;
+  }
+
+  .wrapper {
+    margin-left: 35%;
+    height: 900px;
+    width: 600px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+html,body { margin:0; min-height:100%; background:#121212; }
+.archive-note { margin-top:64px; padding:12px 18px; background:#292132; color:#eddefb; font:13px/1.5 Arial,sans-serif; }
+.archive-note span { color:#cbbcd6; }
+.archive-settings { padding:24px 12px; color:#b982f5; font:14px/1.55 Arial,sans-serif; }
+.archive-settings p + p { margin-top:12px; }
+.wrapper { margin:0 auto; width:min(600px,100%); height:auto; min-height:calc(100vh - 236px); padding-bottom:130px; display:block; }
+.wrapper .v-main { padding:0 !important; }
+.sample-choices { display:flex; flex-wrap:wrap; gap:8px; padding:18px 12px 4px; }
+.sample-choices button { border:1px solid #695674; padding:7px 10px; border-radius:4px; font:13px/1.4 Arial,sans-serif; color:#dfc8ee; }
+.sample-choices button:hover,.sample-choices button[aria-pressed="true"] { background:#413149; border-color:#b982f5; }
+.sample-choices button:focus-visible { outline:2px solid #b982f5; outline-offset:3px; }
+.messages { padding-bottom:12px; }
+.archive-error { padding:30px; color:#eddefb; font:16px/1.5 Arial,sans-serif; }
+</style>
+</head>
+<body>
+<!-- Original component from Colbyco/OpenAI-Chat-Bot f6d6e7eef6029521d1637eb3c27cafcfec80ecab.
+     The request adapter is replaced by explicitly labeled fixed samples for the retired model. -->
+<div id="app"><p class="archive-error">Loading the original Vue/Vuetify interface…</p></div>
+<script type="text/x-template" id="original-interface">
+  <v-app theme="dark">
+
+    <v-app-bar app>
+      <v-btn
+        icon="mdi-cog-outline" aria-label="Open original model settings"
+        color="primary"
+        @click.stop="drawer = !drawer"
+      ></v-btn>
+
+      <v-btn
+        icon="mdi-github" aria-label="Colby on GitHub"
+        color="primary"
+        href="https://github.com/Colbyco"
+        target="_blank"
+      ></v-btn>
+
+      <v-btn
+        icon="mdi-linkedin" aria-label="Colby on LinkedIn"
+        color="primary"
+        href="https://www.linkedin.com/in/bakercolby/"
+        target="_blank"
+      ></v-btn>
+
+      <v-btn
+        icon="mdi-email" aria-label="Copy Colby’s email"
+        color="primary"
+        @click="copyToClipBoard('Colbyco017@gmail.com')"
+      ></v-btn>
+
+    </v-app-bar>
+
+    <v-navigation-drawer v-model="drawer" temporary>
+        <div class="settingsSliders pt-2 pl-2">
+          <div class="temperatureSetting">
+            <div class="temperatureLabel">
+              <span
+                class="text-center settingsText"
+                >
+                Temperature</span>
+            </div>
+
+            <div class="temperatureSlider">
+              <v-slider
+                v-model="temperatureSlider"
+                class="align-center"
+                :max="1.0"
+                :min="0.1"
+                :step="0.1"
+                hide-details
+              >
+                <template v-slot:append>
+                  <v-text-field
+                    v-model="temperatureSlider"
+                    color="primary"
+                    hide-details
+                    single-line
+                    density="compact"
+                    type="number"
+                    style="width: 75px"
+                  ></v-text-field>
+                </template>
+              </v-slider>
+            </div>
+          </div>
+
+          <div class="tokensSetting mt-10">
+            <div class="tokensLabel">
+              <span
+                class="text-center settingsText"
+                >
+                Max Tokens</span>
+            </div>
+
+            <div class="tokensSlider">
+              <v-slider
+                v-model="tokensSlider"
+                class="align-center"
+                :max="1500"
+                :min="200"
+                :step="50"
+                hide-details
+              >
+                <template v-slot:append>
+                  <v-text-field
+                    v-model="tokensSlider"
+                    color="primary"
+                    hide-details
+                    single-line
+                    density="compact"
+                    type="number"
+                    style="width: 90px">
+                  </v-text-field>
+                </template>
+              </v-slider>
+            </div>
+          </div>
+        </div>
+
+          <div class="archive-settings">
+            <p><strong>Original model</strong><br>text-davinci-002</p>
+            <p>The original service shut down on 4 January 2024. This archive uses fixed example replies. Settings remain available to explore the original interface.</p>
+          </div>
+    </v-navigation-drawer>
+
+    <!-- Sizes your content based upon application components -->
+    <div class="archive-note">2022 UI archive · Illustrative sample conversation · Fixed replies<br><span>Original Vue/Vuetify interface. Choose an example below to explore the message flow.</span></div>
+    <div class="wrapper">
+      <v-main>
+        <div class="sample-choices"><button v-for="sample in samples" :key="sample.prompt" type="button" @click="userMessage = sample.prompt" :aria-pressed="userMessage === sample.prompt">{{ sample.prompt }}</button></div>
+        <div class="messages">
+          <ul v-for="{ message, from } in messageArray" v-bind:class="{'userMessage': from === 'user', 'aiMessage': !(from === 'user')}">
+            <div v-bind:class="{'userBubble': from === 'user', 'aiBubble': !(from === 'user')}">
+              {{ message }}
+            </div>
+          </ul>
+        </div>
+      </v-main>
+    </div>
+
+      <v-footer class="mb" height="100" app>
+        <v-text-field
+          density="default"
+          class="textField"
+          readonly
+          v-model="userMessage"
+          @keydown.enter.prevent="sendSample(userMessage)"
+          color="primary"
+          :counter="100"
+          :rules="[messageLengthValidation(userMessage)]"
+          label="Selected example">
+        </v-text-field>
+        <v-btn class="ml-3 mb-10" color="primary" @click="sendSample(userMessage)" :disabled="!userMessage">Send</v-btn>
+      </v-footer>
+  </v-app>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuetify@3.0.0-beta.4/dist/vuetify.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  if (!window.Vue || !window.Vuetify) {
+    document.getElementById("app").textContent = "The archived interface could not load its Vue/Vuetify libraries. Please reload to try again.";
+    return;
+  }
+  const {ref} = Vue;
+  const samples = [
+    {prompt:"What can you help with?",reply:"I can answer questions, explain a topic, or help you brainstorm ideas."},
+    {prompt:"Explain an API simply.",reply:"An API lets one program request information or actions from another program through a defined interface."},
+    {prompt:"Suggest a weekend coding project.",reply:"Try building a weather dashboard that looks up a city and saves your recent searches."}
+  ];
+  const app = Vue.createApp({
+    template:document.getElementById("original-interface").innerHTML,
+    setup() {
+      const userMessage = ref(samples[0].prompt);
+      const temperatureSlider = ref(0.7);
+      const tokensSlider = ref(1000);
+      const drawer = ref(false);
+      const messageArray = ref([
+        {message:"Hello!",from:"user"},
+        {message:"Hi! How can I help you today?",from:"ai"}
+      ]);
+      function sendSample(prompt) {
+        const sample = samples.find(item => item.prompt === prompt);
+        if (!sample) return;
+        messageArray.value.push({message:sample.prompt,from:"user"},{message:sample.reply,from:"ai"});
+        if (messageArray.value.length > 12) messageArray.value.splice(0,2);
+        userMessage.value = "";
+      }
+      function messageLengthValidation(message) { return message.length <= 100 || "Message Must be 100 Characters or Less"; }
+      function copyToClipBoard(email) { navigator.clipboard?.writeText(email).catch(() => {}); }
+      return {samples,userMessage,temperatureSlider,tokensSlider,drawer,messageArray,sendSample,messageLengthValidation,copyToClipBoard};
+    }
+  });
+  app.use(Vuetify.createVuetify());
+  app.mount("#app");
+})();
+</script>
+</body>
+</html>

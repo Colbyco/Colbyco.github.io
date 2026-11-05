@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Spotify Classic Lyrics — interactive desktop preview</title>
+<style>:root { color-scheme: light dark; --surface: light-dark(#faf8fc, #1c1a21); --text: light-dark(#282132, #f1edf7); --muted: light-dark(#62586f, #c0b8ca); --line: light-dark(#92849f, #71617f); --action: light-dark(#68449a, #b7a0e6); --action-text: light-dark(#fff, #24172f); --action-hover: light-dark(#573482, #c7b2ee); --hover: light-dark(#eee7f5, #2d2636); --focus: light-dark(#68449a, #c5a5ff); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--text); font: 14px/1.5 "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif; }
+main { padding: 23px; }
+h1 { margin: 0 0 6px; font-size: 17px; line-height: 1.4; font-weight: 500; }
+.heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.heading h1 { margin: 0; }
+.appearance-control { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.appearance-control select { width: 86px; padding: 4px 5px; font-size: 12px; }
+.description { color: var(--muted); margin: 0 0 18px; }
+button, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: .5; }
+.actions { display: flex; align-items: center; gap: 10px; }
+.primary { flex: 1; padding: 9px 14px; border: 1px solid transparent; border-radius: 5px; background: var(--action); color: var(--action-text); font-weight: 500; }
+.primary:hover:not(:disabled) { background: var(--action-hover); }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.text-button { padding: 6px; border: 0; border-radius: 3px; color: var(--muted); background: transparent; font-size: 12px; }
+.text-button:hover:not(:disabled) { color: var(--text); background: var(--hover); }
+.automatic, .consent { display: flex; align-items: flex-start; gap: 9px; margin-top: 20px; cursor: pointer; font-size: 13px; }
+input[type=checkbox] { flex: none; width: 15px; height: 15px; margin: 3px 0 0; accent-color: var(--action); }
+small { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+.support { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.updates { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); margin-top: 7px; padding-top: 4px; color: var(--muted); font-size: 11px; }
+.updates button { flex-shrink: 0; }
+.error { color: light-dark(#a81f25, #ffa5aa); margin: 12px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+.back { padding-left: 0; margin: -7px 0 12px; }
+.field { display: block; margin: 19px 0 5px; font-size: 13px; }
+select { display: block; width: 100%; padding: 7px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--text); }
+.findings { padding-left: 19px; font-size: 13px; margin: 19px 0; }
+.findings li + li { margin-top: 8px; }
+details { font-size: 12px; margin: 14px 0; }
+summary { cursor: pointer; color: var(--muted); }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; line-height: 1.5; padding: 10px; border: 1px solid var(--line); border-radius: 4px; background: light-dark(#f1ecf7, #25212c); }
+.privacy { font-size: 12px; color: var(--muted); margin: 12px 0; }
+.consent { margin: 19px 0 14px; }
+#report-status { font-size: 12px; margin: 12px 0 0; overflow-wrap: anywhere; }
+[hidden] { display: none !important; }
+
+body { min-height: 100vh; }
+.preview-header { padding: 16px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.preview-header p { margin: 3px 0 0; max-width: 42rem; font-size: 12px; color: var(--muted); }
+.preview-header strong { font-size: 13px; font-weight: 600; }
+.preview-header button { white-space: nowrap; border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; color: var(--text); background: var(--surface); }
+#app-window { max-width: 460px; margin: 28px auto; }
+#original-source { padding: 18px 22px; }
+#original-source pre { margin: 0; max-height: none; }
+.source-note { max-width: 460px; margin: 12px auto 24px; padding-inline: 23px; font-size: 11px; color: var(--muted); }
+@media(max-width: 440px) { .preview-header { align-items: flex-start; flex-direction: column; gap: 8px; padding: 12px 16px; } #app-window { margin-top: 8px; padding: 16px; } .heading { flex-wrap: wrap; } }
+</style></head><body>
+<!-- Original renderer and styling, Colbyco/spotify-classic-lyrics @ 7bd2c2c2b42e0c8f0f571c062b320d365b25155a. The bridge below supplies browser-only sample state.
+MIT License
+
+Copyright (c) 2026 Colby Baker
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ -->
+<header class="preview-header"><div><strong>Interactive desktop preview</strong><p>The original app interface with sample preferences. Try Fix, Undo, Theme and the diagnostic report. Actions stay within this preview.</p></div><button type="button" id="source-toggle" aria-expanded="false" aria-controls="original-source">Original renderer</button></header>
+<main id="app-window">
+  <section id="home">
+    <header class="heading"><h1>Spotify lyrics fix</h1><label class="appearance-control"><span>Theme</span><select id="appearance" aria-label="Appearance"><option value="system">System</option><option value="dark">Dark</option><option value="light">Light</option></select></label></header>
+    <p id="message" class="description" aria-live="polite">Checking Spotify…</p>
+    <div class="actions"><button id="fix" class="primary" disabled>Fix lyrics layout</button><button id="undo" class="text-button" disabled>Undo</button></div>
+    <label class="automatic"><input type="checkbox" id="auto"><span>Check and fix at startup<small>Runs once at sign-in. Spotify must be closed.</small></span></label>
+    <div class="support"><button id="check" class="text-button">Check again</button><button id="report" class="text-button" hidden>Report a problem</button></div>
+    <div id="updates" class="updates" hidden><span id="update-status" aria-live="polite"></span><button id="update-check" class="text-button">Check updates</button><button id="update-install" class="text-button" hidden>Restart to update</button></div>
+  </section>
+  <section id="report-view" hidden aria-labelledby="report-heading">
+    <button id="back" class="text-button back">← Back</button>
+    <h1 id="report-heading">Report a problem</h1>
+    <label class="field" for="issue">What went wrong?</label>
+    <select id="issue">
+      <option value="lyrics-still-fullscreen">Lyrics still take over the window</option>
+      <option value="fix-failed">The fix failed</option>
+      <option value="automatic-repair-failed">Automatic repair didn't work</option>
+      <option value="other">Something else</option>
+    </select>
+    <ul id="findings" class="findings" aria-live="polite"></ul>
+    <details><summary>View report details</summary><pre id="report-data"></pre></details>
+    <p class="privacy">Includes app and Spotify versions, your operating system, the lyrics setting, and error categories. No account details, songs, file paths, or full logs.</p>
+    <p class="privacy">This browser sample shows example diagnostics. Sending and saving reports are available in the desktop app.</p>
+    <label class="consent"><input id="consent" type="checkbox"><span>I agree to send this report.</span></label>
+    <div class="actions"><button id="send" class="primary" disabled>Send report</button><button id="save" class="text-button">Save instead</button></div>
+    <p id="report-status" class="description" aria-live="polite"></p>
+  </section>
+  <p id="error" class="error" role="alert" hidden></p>
+</main>
+<section id="original-source" hidden aria-label="Original renderer source"><pre>'use strict';
+const $ = id =&gt; document.getElementById(id);
+let pending = false, report = null;
+const command = (name, arg) =&gt; window.classicLyrics.command(name, arg);
+function render(state) {
+  $('message').textContent = state.message;
+  $('auto').checked = state.autoRepair;
+  $('appearance').value = state.appearance || 'system';
+  $('appearance').disabled = pending || state.kind === 'working';
+  $('fix').textContent = state.kind === 'fixed' ? 'Fixed' : state.kind === 'working' ? 'Working…' : 'Fix lyrics layout';
+  $('fix').disabled = pending || !['needs-fix', 'error', 'unavailable'].includes(state.kind);
+  $('undo').disabled = pending || !state.canUndo;
+  $('check').disabled = pending || state.kind === 'working';
+  $('auto').disabled = pending || state.kind === 'working';
+  $('report').hidden = !state.canReport;
+  $('report').disabled = pending || state.kind === 'working';
+  const update = state.update;
+  $('updates').hidden = !update;
+  $('update-status').textContent = update ? (update.message || `v${state.version}`) : '';
+  $('update-check').hidden = ['ready', 'installing'].includes(update?.kind);
+  $('update-check').disabled = pending || ['checking', 'downloading'].includes(update?.kind);
+  $('update-install').hidden = update?.kind !== 'ready';
+  $('update-install').disabled = pending || state.kind === 'working';
+}
+function renderReport(value) {
+  report = value;
+  $('home').hidden = true; $('report-view').hidden = false;
+  $('issue').value = value.report.issue;
+  $('findings').replaceChildren(...value.findings.map(finding =&gt; { const li = document.createElement('li'); li.textContent = finding.text; return li; }));
+  $('report-data').textContent = JSON.stringify(value.report, null, 2);
+  $('consent').checked = false;
+  $('consent').disabled = pending || value.sent;
+  $('issue').disabled = pending || value.sent;
+  $('send').textContent = value.sent ? 'Sent' : 'Send report';
+  $('send').disabled = true;
+  $('report-status').textContent = value.sent ? `Report sent. Reference: ${value.id}` : '';
+}
+async function act(name, value) {
+  if (pending) return;
+  pending = true; $('error').hidden = true;
+  for (const id of ['fix', 'undo', 'check', 'auto', 'report', 'send', 'save', 'back', 'issue', 'consent', 'appearance', 'update-check', 'update-install']) $(id).disabled = true;
+  if (name === 'send-report') $('report-status').textContent = 'Sending…';
+  try {
+    const result = await command(name, value);
+    if (name === 'report' || name === 'report-issue') renderReport(result);
+    else if (name === 'send-report') {
+      report.sent = result.sent; $('consent').disabled = true; $('issue').disabled = true;
+      $('send').textContent = 'Sent'; $('report-status').textContent = `Report sent. Reference: ${result.id}`;
+    } else if (name === 'save-report') $('report-status').textContent = result.saved ? 'Report saved on this computer.' : '';
+    else if (name === 'report-close') { report = null; $('report-view').hidden = true; $('home').hidden = false; }
+    else if (result) render(result);
+  } catch (error) {
+    if (name === 'report-issue' &amp;&amp; report) $('issue').value = report.report.issue;
+    $('error').textContent = error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, ''); $('error').hidden = false;
+    if (name === 'send-report') $('report-status').textContent = 'Not confirmed. You can retry or save the report.';
+  } finally {
+    pending = false;
+    render(await command('status'));
+    $('send').disabled = !report || report.sent || !$('consent').checked;
+    $('save').disabled = false; $('back').disabled = false; $('issue').disabled = report?.sent || false;
+    $('consent').disabled = report?.sent || false;
+  }
+}
+for (const id of ['fix', 'undo', 'check', 'report', 'update-check', 'update-install']) $(id).addEventListener('click', () =&gt; act(id));
+$('auto').addEventListener('change', event =&gt; act('auto', event.target.checked));
+$('appearance').addEventListener('change', event =&gt; act('appearance', event.target.value));
+$('back').addEventListener('click', () =&gt; act('report-close'));
+$('issue').addEventListener('change', event =&gt; act('report-issue', { id: report?.id, issue: event.target.value }));
+$('consent').addEventListener('change', () =&gt; { $('send').disabled = pending || !report || report.sent || !$('consent').checked; });
+$('send').addEventListener('click', () =&gt; act('send-report', { id: report?.id, consent: $('consent').checked }));
+$('save').addEventListener('click', () =&gt; act('save-report', { id: report?.id }));
+window.classicLyrics.onStatus(render);
+command('status').then(render);
+</pre></section>
+<p class="source-note">Original interface from release v1.0.4 · source 7bd2c2c. Desktop integration is represented by a browser-only sample.</p>
+<script>(() => {
+  "use strict";
+  const listeners = new Set();
+  let state = {
+    kind: "needs-fix",
+    message: "Put lyrics back beside your library and playback controls.",
+    autoRepair: false,
+    appearance: "system",
+    canUndo: false,
+    canReport: false,
+    version: "1.0.4",
+    update: { kind: "current", message: "v1.0.4 · Browser sample" }
+  };
+  let currentReport = null;
+  function emit(patch) {
+    state = { ...state, ...patch };
+    for (const listener of listeners) listener({ ...state });
+    return { ...state };
+  }
+  function exampleReport(issue = "lyrics-still-fullscreen") {
+    return {
+      id: "browser-sample",
+      sent: false,
+      report: {
+        schema: 1, appVersion: "1.0.4", platform: "win32",
+        osVersion: "10.0.22631", architecture: "x64", spotifyVersion: "1.2.73",
+        installation: "desktop", spotifyRunning: false,
+        storageState: state.kind === "fixed" ? "fixed" : "needs-fix",
+        flagValues: [state.kind === "fixed" ? "CONTROL" : "PERSISTENT_UNLIMITED"],
+        readErrors: [], lastFix: state.kind === "fixed" ? "saved" : "not-attempted",
+        lastError: "none", automaticRepair: state.autoRepair, issue
+      },
+      findings: [
+        { text: "Example Spotify desktop installation found." },
+        { text: state.kind === "fixed" ? "The sample lyrics preference is set to the classic layout." : "The sample lyrics preference is set to the fullscreen layout." },
+        { text: "These diagnostics belong to the browser sample." }
+      ]
+    };
+  }
+  window.classicLyrics = Object.freeze({
+    onStatus(callback) { listeners.add(callback); return () => listeners.delete(callback); },
+    async command(name, argument) {
+      switch (name) {
+        case "status": return { ...state };
+        case "check": return emit({});
+        case "appearance":
+          if (!["system", "dark", "light"].includes(argument)) throw new Error("Choose System, Dark, or Light.");
+          document.documentElement.style.colorScheme = argument === "system" ? "light dark" : argument;
+          return emit({ appearance: argument });
+        case "fix":
+        case "undo": {
+          const undo = name === "undo";
+          emit({ kind: "working", message: undo ? "Restoring your previous lyrics preference…" : "Saving the classic lyrics preference…" });
+          await new Promise(resolve => setTimeout(resolve, 350));
+          return emit({
+            kind: undo ? "needs-fix" : "fixed",
+            message: undo ? "Your previous lyrics preference was restored. Automatic repair is off." : "The lyrics setting is saved. Open Lyrics in Spotify to check it.",
+            canUndo: !undo, canReport: true, autoRepair: undo ? false : state.autoRepair
+          });
+        }
+        case "auto": return emit({ autoRepair: argument === true });
+        case "report": currentReport = exampleReport(); return currentReport;
+        case "report-issue": currentReport = exampleReport(argument?.issue); return currentReport;
+        case "report-close": currentReport = null; return;
+        case "send-report": throw new Error("Sending reports is available in the desktop app. This preview uses example diagnostics.");
+        case "save-report": throw new Error("Saving diagnostics is available in the desktop app. This preview uses example diagnostics.");
+        case "update-check": return emit({ update: { kind: "current", message: "v1.0.4 · Browser sample" } });
+        case "update-install": throw new Error("Installing updates is available in the desktop app.");
+        default: throw new Error("This action is available in the desktop app.");
+      }
+    }
+  });
+  const sourceToggle = document.getElementById("source-toggle");
+  sourceToggle.addEventListener("click", () => {
+    const show = sourceToggle.getAttribute("aria-expanded") !== "true";
+    sourceToggle.setAttribute("aria-expanded", String(show));
+    document.getElementById("original-source").hidden = !show;
+    document.getElementById("app-window").hidden = show;
+    sourceToggle.textContent = show ? "Return to app" : "Original renderer";
+  });
+})();</script>
+<script>'use strict';
+const $ = id => document.getElementById(id);
+let pending = false, report = null;
+const command = (name, arg) => window.classicLyrics.command(name, arg);
+function render(state) {
+  $('message').textContent = state.message;
+  $('auto').checked = state.autoRepair;
+  $('appearance').value = state.appearance || 'system';
+  $('appearance').disabled = pending || state.kind === 'working';
+  $('fix').textContent = state.kind === 'fixed' ? 'Fixed' : state.kind === 'working' ? 'Working…' : 'Fix lyrics layout';
+  $('fix').disabled = pending || !['needs-fix', 'error', 'unavailable'].includes(state.kind);
+  $('undo').disabled = pending || !state.canUndo;
+  $('check').disabled = pending || state.kind === 'working';
+  $('auto').disabled = pending || state.kind === 'working';
+  $('report').hidden = !state.canReport;
+  $('report').disabled = pending || state.kind === 'working';
+  const update = state.update;
+  $('updates').hidden = !update;
+  $('update-status').textContent = update ? (update.message || `v${state.version}`) : '';
+  $('update-check').hidden = ['ready', 'installing'].includes(update?.kind);
+  $('update-check').disabled = pending || ['checking', 'downloading'].includes(update?.kind);
+  $('update-install').hidden = update?.kind !== 'ready';
+  $('update-install').disabled = pending || state.kind === 'working';
+}
+function renderReport(value) {
+  report = value;
+  $('home').hidden = true; $('report-view').hidden = false;
+  $('issue').value = value.report.issue;
+  $('findings').replaceChildren(...value.findings.map(finding => { const li = document.createElement('li'); li.textContent = finding.text; return li; }));
+  $('report-data').textContent = JSON.stringify(value.report, null, 2);
+  $('consent').checked = false;
+  $('consent').disabled = pending || value.sent;
+  $('issue').disabled = pending || value.sent;
+  $('send').textContent = value.sent ? 'Sent' : 'Send report';
+  $('send').disabled = true;
+  $('report-status').textContent = value.sent ? `Report sent. Reference: ${value.id}` : '';
+}
+async function act(name, value) {
+  if (pending) return;
+  pending = true; $('error').hidden = true;
+  for (const id of ['fix', 'undo', 'check', 'auto', 'report', 'send', 'save', 'back', 'issue', 'consent', 'appearance', 'update-check', 'update-install']) $(id).disabled = true;
+  if (name === 'send-report') $('report-status').textContent = 'Sending…';
+  try {
+    const result = await command(name, value);
+    if (name === 'report' || name === 'report-issue') renderReport(result);
+    else if (name === 'send-report') {
+      report.sent = result.sent; $('consent').disabled = true; $('issue').disabled = true;
+      $('send').textContent = 'Sent'; $('report-status').textContent = `Report sent. Reference: ${result.id}`;
+    } else if (name === 'save-report') $('report-status').textContent = result.saved ? 'Report saved on this computer.' : '';
+    else if (name === 'report-close') { report = null; $('report-view').hidden = true; $('home').hidden = false; }
+    else if (result) render(result);
+  } catch (error) {
+    if (name === 'report-issue' && report) $('issue').value = report.report.issue;
+    $('error').textContent = error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, ''); $('error').hidden = false;
+    if (name === 'send-report') $('report-status').textContent = 'Not confirmed. You can retry or save the report.';
+  } finally {
+    pending = false;
+    render(await command('status'));
+    $('send').disabled = !report || report.sent || !$('consent').checked;
+    $('save').disabled = false; $('back').disabled = false; $('issue').disabled = report?.sent || false;
+    $('consent').disabled = report?.sent || false;
+  }
+}
+for (const id of ['fix', 'undo', 'check', 'report', 'update-check', 'update-install']) $(id).addEventListener('click', () => act(id));
+$('auto').addEventListener('change', event => act('auto', event.target.checked));
+$('appearance').addEventListener('change', event => act('appearance', event.target.value));
+$('back').addEventListener('click', () => act('report-close'));
+$('issue').addEventListener('change', event => act('report-issue', { id: report?.id, issue: event.target.value }));
+$('consent').addEventListener('change', () => { $('send').disabled = pending || !report || report.sent || !$('consent').checked; });
+$('send').addEventListener('click', () => act('send-report', { id: report?.id, consent: $('consent').checked }));
+$('save').addEventListener('click', () => act('save-report', { id: report?.id }));
+window.classicLyrics.onStatus(render);
+command('status').then(render);
+</script>
+</body></html>

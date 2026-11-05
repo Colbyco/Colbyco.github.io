@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Weather Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+body {
+    font-family: Helvetica;
+    font-size: 0.9rem;
+    margin-bottom: 6rem !important;
+}
+
+.center {
+    margin: auto;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.styled-table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 12px;
+}
+
+.styled-table tbody tr {
+    border-bottom: thin solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.input{
+    width:20%;
+}
+
+.button {
+    appearance:none;
+    -webkit-appearance:none;
+    padding:5px;
+    border:none;
+    background-color:#3F51B5;
+    color:#fff;
+    font-weight:600;
+    border-radius:5px;
+    width:25%;
+  }
+</style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <!-- Original view and styling from Colbyco/weather-database-website, commit 80de993b7dc617a679e6c67593143be2979e7e68.
+         Compatibility layer replaces Express/PostgreSQL/OpenWeather with browser storage and Open-Meteo. -->
+    <aside class="preview-note">Restored 2021 interface. Live weather from <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, with observations saved in this browser for one hour. Minimum and maximum show today's forecast range.</aside>
+    <form method="post" action="" class="center input">
+        <label for="city_name" class="form-label">Enter a city name:</label><br>
+        <input type="text" id="city_name" name="city_name" placeholder="Chicago" value="Chicago" minlength="2" maxlength="100" required class="form-control"><br>
+        <button type="submit" class="button btn-primary">Submit</button>
+    </form>
+
+    <p class="lookup-status" id="lookup-status" role="status">Loading Chicago weather…</p>
+    <div class="table-scroll" tabindex="0" aria-label="Weather observations">
+            <table class="styled-table">
+                <thead><tr>
+                    <th>City Name</th>
+                    <th>Weather Condition</th>
+                    <th>Temperature</th>
+                    <th>Feels Like Temperature</th>
+                    <th>Minimum Temperature</th>
+                    <th>Maximum Temperature</th>
+                    <th>Pressure</th>
+                    <th>Humidity</th>
+                    <th>Time Searched</th>
+                </tr></thead>
+<tbody id="weather-rows">
+
+            </tbody></table></div>
+
+<style>
+.preview-note { margin: 0; padding: 12px 18px; background: #eef0fa; color: #3c4158; font: 13px/1.5 Arial, sans-serif; border-bottom: 1px solid #d8dce9; }
+.input { width: min(340px, calc(100% - 32px)); padding-top: 26px; }
+.button { width: auto; min-width: 90px; }
+.lookup-status { min-height: 1.5em; text-align: center; margin: 6px 16px 18px; font-size: 14px; }
+.table-scroll { width: 100%; overflow-x: auto; padding: 0 16px 24px; }
+.styled-table { min-width: 920px; }
+.styled-table th { font-weight: 700; }
+.preview-note a { color: #3f51b5; }
+button:disabled { opacity: .55; cursor: wait; }
+</style>
+<script>
+(() => {
+  "use strict";
+  const form = document.querySelector("form");
+  const input = document.getElementById("city_name");
+  const button = form.querySelector("button");
+  const status = document.getElementById("lookup-status");
+  const rows = document.getElementById("weather-rows");
+  const storageKey = "colby-weather-preview-v1";
+  const fields = ["city_name", "weather_conditions", "temp", "feels_like", "temp_min", "temp_max", "pressure", "humidity", "ts"];
+  let observations = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    if (Array.isArray(saved)) observations = saved.filter(item => item && typeof item.city_name === "string" && typeof item.weather_conditions === "string" && Number.isFinite(item.ts) && ["temp", "feels_like", "pressure", "humidity"].every(key => Number.isFinite(item[key])));
+  } catch (_) {}
+  function render() {
+    observations = observations.filter(item => item.ts > Date.now() - 3600000).slice(0, 20);
+    rows.replaceChildren();
+    for (const observation of observations) {
+      const row = document.createElement("tr");
+      for (const key of fields) {
+        const cell = document.createElement("td");
+        const value = observation[key];
+        if (key === "ts") cell.textContent = new Date(value).toLocaleString("en-US", {timeZone: "UTC"}) + " UTC";
+        else if (["temp", "feels_like", "temp_min", "temp_max"].includes(key)) cell.textContent = Number.isFinite(value) ? value.toFixed(1) + "° F" : "—";
+        else if (key === "pressure") cell.textContent = Math.round(value) + " hPa";
+        else if (key === "humidity") cell.textContent = Math.round(value) + "%";
+        else cell.textContent = value;
+        row.appendChild(cell);
+      }
+      rows.appendChild(row);
+    }
+  }
+  function condition(code) {
+    const conditions = {0:"Clear",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Dense drizzle",56:"Freezing drizzle",57:"Freezing drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",66:"Freezing rain",67:"Freezing rain",71:"Light snow",73:"Snow",75:"Heavy snow",77:"Snow grains",80:"Rain showers",81:"Rain showers",82:"Heavy rain showers",85:"Snow showers",86:"Heavy snow showers",95:"Thunderstorm",96:"Thunderstorm with hail",99:"Thunderstorm with hail"};
+    return conditions[code] || "Unavailable";
+  }
+  async function request(url, signal) {
+    const response = await fetch(url, {signal});
+    if (!response.ok) throw new Error("The weather service is unavailable. Please try again.");
+    const data = await response.json();
+    if (data.error) throw new Error("The weather service could not complete this lookup.");
+    return data;
+  }
+  async function lookup() {
+    const name = input.value.trim();
+    if (name.length < 2) { status.textContent = "Enter at least two letters."; return; }
+    button.disabled = true;
+    status.textContent = "Looking up " + name + "…";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+    try {
+      const locations = await request("https://geocoding-api.open-meteo.com/v1/search?" + new URLSearchParams({name, count:"1", language:"en", format:"json"}), controller.signal);
+      const place = locations.results?.[0];
+      if (!place) throw new Error("No city found. Try a city and country, such as Paris, France.");
+      const params = new URLSearchParams({
+        latitude: place.latitude, longitude: place.longitude,
+        current: "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl",
+        daily: "temperature_2m_max,temperature_2m_min",
+        temperature_unit: "fahrenheit", timezone: "auto", forecast_days:"1"
+      });
+      const weather = await request("https://api.open-meteo.com/v1/forecast?" + params, controller.signal);
+      const current = weather.current;
+      if (!current || !["temperature_2m","apparent_temperature","pressure_msl","relative_humidity_2m"].every(key => Number.isFinite(current[key]))) throw new Error("The service returned incomplete weather data. Please try again.");
+      const city = [place.name, place.admin1, place.country].filter(Boolean).join(", ");
+      observations.unshift({
+        city_name: city, weather_conditions: condition(current.weather_code),
+        temp: current.temperature_2m, feels_like: current.apparent_temperature,
+        temp_min: weather.daily?.temperature_2m_min?.[0],
+        temp_max: weather.daily?.temperature_2m_max?.[0],
+        pressure: current.pressure_msl, humidity: current.relative_humidity_2m, ts: Date.now()
+      });
+      render();
+      let saved = true;
+      try { localStorage.setItem(storageKey, JSON.stringify(observations)); } catch (_) { saved = false; }
+      status.textContent = "Added " + city + ". " + (saved ? "History is stored in this browser." : "History is available for this visit.");
+    } catch (error) {
+      status.textContent = error.name === "AbortError" ? "The lookup timed out. Please try again." : (error instanceof TypeError ? "Could not reach the weather service. Check your connection and try again." : error.message);
+    } finally {
+      clearTimeout(timer);
+      button.disabled = false;
+    }
+  }
+  form.addEventListener("submit", event => { event.preventDefault(); lookup(); });
+  render();
+  lookup();
+})();
+</script>
+
+</body>
+</html>
