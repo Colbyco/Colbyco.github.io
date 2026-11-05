@@ -12,7 +12,8 @@
   <meta property="og:url" content="https://colbyco.github.io/">
   <link rel="canonical" href="https://colbyco.github.io/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%233f3882'/%3E%3Cpath d='M21 15H15L8 24l7 9h6m5-18h7l5 5-5 4 6 4-6 5h-7Z' fill='none' stroke='%23e7f8a9' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./portfolio.css?v=13c1c108">
+  <link rel="stylesheet" href="./portfolio.css?v=cca8ad0b">
+  <script src="./aspicio-preview.js?v=4aafce05" defer></script>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -43,11 +44,23 @@
       </div>
       <article class="feature" aria-labelledby="featured-name">
         <div class="feature-header"><span class="eyebrow">Featured project</span><span class="feature-date">2026</span></div>
-        <figure class="chart-frame"><img src="./j2000.svg" width="540" height="300" alt="A circular plot showing the geocentric longitudes of ten solar system bodies."><figcaption>Sample planetary positions · 1 Jan 2000</figcaption></figure>
+        <div class="feature-title">
+          <h2 id="featured-name">Aspicio</h2>
+          <p>Third year as a software engineer</p>
+        </div>
+        <div class="aspicio-preview" id="aspicio-preview" hidden>
+          <iframe id="aspicio-preview-frame" title="Aspicio live site" loading="eager" allow="clipboard-write" referrerpolicy="strict-origin-when-cross-origin" aria-hidden="true" tabindex="-1"></iframe>
+          <div class="preview-status" id="aspicio-preview-status" role="status">
+            <span class="preview-orbit" aria-hidden="true"></span>
+            <p id="aspicio-preview-message">Opening Aspicio for this moment...</p>
+            <button id="aspicio-preview-retry" type="button" hidden>Try again</button>
+          </div>
+        </div>
+        <noscript>
+          <figure class="chart-frame"><img src="./j2000.svg" width="540" height="300" alt="A circular plot showing the geocentric longitudes of ten solar system bodies."><figcaption>Sample planetary positions · 1 Jan 2000. Enable JavaScript for the interactive preview.</figcaption></figure>
+        </noscript>
         <div class="feature-content">
-          <h2 id="featured-name">Aspicio <span class="project-stage">-&nbsp;Third year as a software engineer</span></h2>
-          <p>Cast a chart for a moment in time. Start with Greenwich at noon on January 1, 2000.</p>
-          <a class="feature-link" href="https://aspicio.app/chart?date=2000-01-01&amp;time=12%3A00&amp;lat=51.4779&amp;lng=0&amp;tz=Europe%2FLondon&amp;loc=Greenwich">Open the sample chart <span aria-hidden="true">↗</span></a>
+          <a class="feature-link" id="aspicio-preview-open" href="https://aspicio.app/chart" target="_blank" rel="noopener noreferrer">Open Aspicio in a new tab <span aria-hidden="true">↗</span></a>
         </div>
       </article>
     </section>
